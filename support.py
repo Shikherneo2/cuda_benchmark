@@ -13,7 +13,7 @@ def default_params():
     batches = 500
     return rnn_size, learning_rate, batches
 
-def toy_batch16(seed=11, shape=(32, 100, 123), classes=10):
+def toy_batch16(seed=11, shape=(8, 100, 123), classes=10):
     batch_size, max_len, features = shape
     np.random.seed(seed)
 
@@ -26,7 +26,7 @@ def toy_batch16(seed=11, shape=(32, 100, 123), classes=10):
 
     return bX, b_lenX, bY, classes
 
-def toy_batch(seed=11, shape=(32, 100, 123), classes=10):
+def toy_batch(seed=11, shape=(8, 100, 123), classes=10):
     batch_size, max_len, features = shape
     np.random.seed(seed)
 
@@ -101,17 +101,13 @@ def check_results(batch_loss_list, batch_time_list, train_start, train_end):
     print('=' * 100)
 
 
-def write_results(script_name, bench, experiment, parameters, run_time, version=None,
+def write_results(script_name, bench, experiment, parameters, run_time, version=None, mode="default",
                   logfile=None):
 
     if logfile == None:
         # Get path
         repo_path = os.path.dirname(os.path.realpath(__file__))
-
-        with open(os.path.join(repo_path, 'results', 'conf')) as f:
-            mode = f.readline().strip()
-
-        logfile = os.path.join(repo_path, 'results', mode, 'results.csv')
+        logfile = os.path.join(repo_path, 'results', mode +'_results.csv')
 
     # Prepare header
     if os.path.isfile(logfile) == False:
