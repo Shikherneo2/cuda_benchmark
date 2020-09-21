@@ -1,19 +1,21 @@
 import os
 import time as timer
 
-from apex import amp
+#from apex import amp
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.autograd import Variable
 
+from sru import SRU
 from support import toy_batch, toy_batch16, default_params, write_results, print_results, check_results
 
 # Experiment_type
 bench = 'pytorch_cudnnGRU_half_precision'
 version = torch.__version__
-torch.backends.cudnn.enabled = False
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.enabled = True
 torch.backends.cudnn.benchmark = False
 experiment = '1x320-LSTM_cross-entropy'
 
@@ -25,11 +27,14 @@ rnn_size, learning_rate, batches = default_params()
 # PyTorch compatibility: time first, batch second
 bX = np.transpose(bX, (1, 0, 2))
 
+print( inp_dims  )
 # Create Network
+#model, _ = amp.initialize(model, [], opt_level="O3")
 class Net(nn.Module):
   def __init__(self):
       super(Net, self).__init__()
       self.gru = nn.GRU( input_size=inp_dims, hidden_size=rnn_size, num_layers=1, bias=True, bidirectional=False )
+      #self.gru = SRU( input_size=inp_dims, hidden_size=rnn_size, num_layers = 2, dropout = 0.0, bidirectional = False, layer_norm = False, highway_bias = 0, rescale = True )
       self.fc1 = nn.Linear( rnn_size, rnn_size//2, bias=False )
       self.fc2 = nn.Linear( rnn_size//2, classes, bias=False )
       self.relu = nn.ReLU()
